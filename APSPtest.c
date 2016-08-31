@@ -7,26 +7,29 @@
 #include "Variables.h"
 #include "Floyd.h"
 
-// global variable
+// global variables
 int process_count, process_rank;
 
 int main(int argc, char **argv)
 {
-	if(argc != 2)
-	{
-		printf("Usage: test {N}\n");
-		exit(-1);
-	}
+    size_t N;
+    int *mat, *ref, *result, *matrix;
+    struct timeval tv1, tv2;
+
+    if(argc != 2)
+    {
+        printf("Usage: test {N}\n");
+        exit(-1);
+    }
 
     MPI_Init(&argc, &argv);
 
     MPI_Comm_size(MPI_COMM_WORLD, &process_count);
     MPI_Comm_rank(MPI_COMM_WORLD, &process_rank);
 
-    size_t N = atoi(argv[1]);
-    int *mat, *ref;
-
-    struct timeval tv1, tv2;
+    N = atoi(argv[1]);
+    matrix = (int*)malloc(sizeof(int)*N*(N/process_count));
+    result = (int*)malloc(sizeof(int)*N*N);
 
     // master process will compute the sequential version
     if (process_rank == 0)
@@ -43,16 +46,14 @@ int main(int argc, char **argv)
         gettimeofday(&tv2, NULL);
         printf("Elasped time = %ld usecs\n", (tv2.tv_sec - tv1.tv_sec) * 1000000 + tv2.tv_usec - tv1.tv_usec);
     }
+
+    // make sure all processes are in sync before we start
     MPI_Barrier(MPI_COMM_WORLD);
 
-    // transfer generated matrix
-    int *result = (int*)malloc(sizeof(int)*N*N);
-    int *matrix = (int*)malloc(sizeof(int)*N*(N/process_count));
     if (process_rank == 0)
         gettimeofday(&tv1, NULL);
+    // scatter the generated matrix and run the algorithm in parallel
     MPI_Scatter(mat, N*(N/process_count), MPI_INT, matrix, N*(N/process_count), MPI_INT, 0, MPI_COMM_WORLD);
-
-    // all processes will compute the parallel version
     PL_APSP(matrix, N, result);
     if (process_rank == 0)
     {
@@ -60,11 +61,10 @@ int main(int argc, char **argv)
         printf("Elasped time = %ld usecs\n", (tv2.tv_sec - tv1.tv_sec) * 1000000 + tv2.tv_usec - tv1.tv_usec);
     }
 
-    MPI_Barrier(MPI_COMM_WORLD);
     // master process will verify the result
     if (process_rank == 0)
     {
-        //compare your result with reference result
+        // compare your result with reference result
         if(CmpArray(result, ref, N*N))
             printf("Your result is correct.\n");
         else

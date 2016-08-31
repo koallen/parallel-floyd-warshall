@@ -5,21 +5,21 @@
 #include "Variables.h"
 #include "Floyd.h"
 
+// global variables
 int process_count, process_rank;
 
 void PL_APSP(int *matrix, int size, int *result)
 {
     int sum, start, end, portion = size / process_count;
+    int *row_k; // to store row k
 
-    // to store row k
-    int *row_k = (int*)malloc(sizeof(int)*size);
+    row_k = (int*)malloc(sizeof(int)*size);
 
     for (int k = 0; k < size; ++k)
     {
+        // broadcast kth row
         if (process_rank == k/portion)
-        {
             memcpy(row_k, matrix+(k%portion)*size, sizeof(int)*size);
-        }
         MPI_Bcast(row_k, size, MPI_INT, k/portion, MPI_COMM_WORLD);
 
         for (int i = 0; i < portion; ++i)
