@@ -1,10 +1,10 @@
 all: test
 
 test: APSPtest.o MatUtil.o
-	gcc-6 -o $@ $?
+	mpicc -o $@ $?
 
 %.o: %.c
-	gcc-6 -c $<
+	mpicc -c $<
 
 clean:
 	rm *.o test
