@@ -1,6 +1,6 @@
 all: test
 
-test: APSPtest.o MatUtil.o
+test: APSPtest.o MatUtil.o Floyd.o
 	mpicc -o $@ $?
 
 %.o: %.c
