@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <mpi.h>
-#include <math.h>
+#include <time.h>
 
 #include "MatUtil.h"
 
@@ -26,6 +26,8 @@ int main(int argc, char **argv)
     size_t N = atoi(argv[1]);
     int *mat, *ref;
 
+    struct timeval tv1, tv2;
+
     // master process will compute the sequential version
     if (process_rank == 0)
     {
@@ -36,7 +38,10 @@ int main(int argc, char **argv)
         //compute the reference result.
         ref = (int*)malloc(sizeof(int)*N*N);
         memcpy(ref, mat, sizeof(int)*N*N);
+        gettimeofday(&tv1, NULL);
         ST_APSP(ref, N);
+        gettimeofday(&tv2, NULL);
+        printf("Elasped time = %ld usecs\n", (tv2.tv_sec - tv1.tv_sec) * 1000000 + tv2.tv_usec - tv1.tv_usec);
 
         //for (int a = 0; a < N; a++)
         //{
@@ -51,10 +56,17 @@ int main(int argc, char **argv)
     // transfer generated matrix
     int *result = (int*)malloc(sizeof(int)*N*N);
     int *matrix = (int*)malloc(sizeof(int)*N*(N/process_count));
+    if (process_rank == 0)
+        gettimeofday(&tv1, NULL);
     MPI_Scatter(mat, N*(N/process_count), MPI_INT, matrix, N*(N/process_count), MPI_INT, 0, MPI_COMM_WORLD);
 
     // all processes will compute the parallel version
     PL_APSP(matrix, N, result);
+    if (process_rank == 0)
+    {
+        gettimeofday(&tv2, NULL);
+        printf("Elasped time = %ld usecs\n", (tv2.tv_sec - tv1.tv_sec) * 1000000 + tv2.tv_usec - tv1.tv_usec);
+    }
     //if (process_rank == 0)
     //{
     //    for (int a = 0; a < N; ++a)
