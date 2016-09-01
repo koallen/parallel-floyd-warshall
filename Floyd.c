@@ -8,7 +8,7 @@
 // global variables
 int process_count, process_rank;
 
-void PL_APSP(int *matrix, int size, int *result)
+void PL_APSP(int *matrix, int size)
 {
     int sum, start, end, portion = size / process_count;
     int *row_k; // to store row k
@@ -35,6 +35,4 @@ void PL_APSP(int *matrix, int size, int *result)
             }
         }
     }
-
-    MPI_Gather(matrix, portion * size, MPI_INT, result, portion * size, MPI_INT, 0, MPI_COMM_WORLD);
 }

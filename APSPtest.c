@@ -54,7 +54,9 @@ int main(int argc, char **argv)
         gettimeofday(&tv1, NULL);
     // scatter the generated matrix and run the algorithm in parallel
     MPI_Scatter(mat, N*(N/process_count), MPI_INT, matrix, N*(N/process_count), MPI_INT, 0, MPI_COMM_WORLD);
-    PL_APSP(matrix, N, result);
+    PL_APSP(matrix, N);
+    // collect the result
+    MPI_Gather(matrix, (N/process_count)*N, MPI_INT, result, (N/process_count)*N, MPI_INT, 0, MPI_COMM_WORLD);
     if (process_rank == 0)
     {
         gettimeofday(&tv2, NULL);
