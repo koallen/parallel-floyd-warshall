@@ -28,23 +28,25 @@ int main(int argc, char **argv)
     MPI_Comm_rank(MPI_COMM_WORLD, &process_rank);
 
     N = atoi(argv[1]);
-    matrix = (int*)malloc(sizeof(int)*N*(N/process_count));
-    result = (int*)malloc(sizeof(int)*N*N);
+    matrix = (int*)malloc(sizeof(int) * N * (N / process_count));
 
     // master process will compute the sequential version
     if (process_rank == 0)
     {
-        //generate a random matrix.
+        // generate a random matrix
         mat = (int*)malloc(sizeof(int)*N*N);
         GenMatrix(mat, N);
 
-        //compute the reference result.
+        // compute the reference result
         ref = (int*)malloc(sizeof(int)*N*N);
         memcpy(ref, mat, sizeof(int)*N*N);
         gettimeofday(&tv1, NULL);
         ST_APSP(ref, N);
         gettimeofday(&tv2, NULL);
         printf("Elasped time = %ld usecs\n", (tv2.tv_sec - tv1.tv_sec) * 1000000 + tv2.tv_usec - tv1.tv_usec);
+
+        // allocate space for parallel implementation result
+        result = (int*)malloc(sizeof(int) * N * N);
     }
 
     // make sure all processes are in sync before we start
@@ -52,11 +54,8 @@ int main(int argc, char **argv)
 
     if (process_rank == 0)
         gettimeofday(&tv1, NULL);
-    // scatter the generated matrix and run the algorithm in parallel
-    MPI_Scatter(mat, N*(N/process_count), MPI_INT, matrix, N*(N/process_count), MPI_INT, 0, MPI_COMM_WORLD);
-    PL_APSP(matrix, N);
-    // collect the result
-    MPI_Gather(matrix, (N/process_count)*N, MPI_INT, result, (N/process_count)*N, MPI_INT, 0, MPI_COMM_WORLD);
+    // run the parallel implementation
+    Floyd_Warshall(mat, N, process_count, matrix, result);
     if (process_rank == 0)
     {
         gettimeofday(&tv2, NULL);
