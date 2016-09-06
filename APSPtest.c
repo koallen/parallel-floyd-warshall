@@ -4,7 +4,6 @@
 #include <sys/time.h>
 
 #include "MatUtil.h"
-#include "Variables.h"
 #include "Floyd.h"
 
 // global variables
@@ -43,7 +42,7 @@ int main(int argc, char **argv)
         gettimeofday(&tv1, NULL);
         ST_APSP(ref, N);
         gettimeofday(&tv2, NULL);
-        printf("Elasped time = %ld usecs\n", (tv2.tv_sec - tv1.tv_sec) * 1000000 + tv2.tv_usec - tv1.tv_usec);
+        printf("Elasped time (sequential) = %ld usecs\n", (tv2.tv_sec - tv1.tv_sec) * 1000000 + tv2.tv_usec - tv1.tv_usec);
 
         // allocate space for parallel implementation result
         result = (int*)malloc(sizeof(int) * N * N);
@@ -55,11 +54,11 @@ int main(int argc, char **argv)
     if (process_rank == 0)
         gettimeofday(&tv1, NULL);
     // run the parallel implementation
-    Floyd_Warshall(mat, N, process_count, matrix, result);
+    Floyd_Warshall(mat, N, matrix, result);
     if (process_rank == 0)
     {
         gettimeofday(&tv2, NULL);
-        printf("Elasped time = %ld usecs\n", (tv2.tv_sec - tv1.tv_sec) * 1000000 + tv2.tv_usec - tv1.tv_usec);
+        printf("Elasped time (parallel)   = %ld usecs\n", (tv2.tv_sec - tv1.tv_sec) * 1000000 + tv2.tv_usec - tv1.tv_usec);
     }
 
     // master process will verify the result

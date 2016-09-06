@@ -2,38 +2,38 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "Variables.h"
 #include "Floyd.h"
+#include "Variables.h"
 
-// global variables
-int process_count, process_rank;
-
-void Floyd_Warshall(int *mat, int N, int process_count, int *matrix, int *result)
+void Floyd_Warshall(int *mat, int N, int *matrix, int *result)
 {
+    int portion = N / process_count;
     // data distribution
-    MPI_Scatter(mat, N * (N / process_count), MPI_INT, matrix, N * (N / process_count), MPI_INT, 0, MPI_COMM_WORLD);
-    PL_APSP(matrix, N);
+    MPI_Scatter(mat, N * portion, MPI_INT, matrix, N * portion, MPI_INT, 0, MPI_COMM_WORLD);
+    PL_APSP(matrix, N, portion);
     // result collection
-    MPI_Gather(matrix, N * (N / process_count), MPI_INT, result, N * (N / process_count), MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Gather(matrix, N * portion, MPI_INT, result, N * portion, MPI_INT, 0, MPI_COMM_WORLD);
 }
 
-void PL_APSP(int *matrix, int size)
+void PL_APSP(int *matrix, int size, int portion)
 {
-    int sum, start, end, portion = size / process_count;
-    int *row_k; // to store row k
+    int sum, start, end, owner_of_k, offset_to_k;
+    int k, i, j;
+    int *row_k = (int*)malloc(sizeof(int) * size); // to store row k
 
-    row_k = (int*)malloc(sizeof(int)*size);
-
-    for (int k = 0; k < size; ++k)
+    for (k = 0; k < size; ++k)
     {
-        // broadcast kth row
-        if (process_rank == k/portion)
-            memcpy(row_k, matrix+(k%portion)*size, sizeof(int)*size);
-        MPI_Bcast(row_k, size, MPI_INT, k/portion, MPI_COMM_WORLD);
+        owner_of_k = k / portion;
+        offset_to_k = (k % portion) * size;
 
-        for (int i = 0; i < portion; ++i)
+        // broadcast kth row
+        if (process_rank == owner_of_k)
+            memcpy(row_k, matrix + offset_to_k, sizeof(int) * size);
+        MPI_Bcast(row_k, size, MPI_INT, owner_of_k, MPI_COMM_WORLD);
+
+        for (i = 0; i < portion; ++i)
         {
-            for (int j = 0; j < size; ++j)
+            for (j = 0; j < size; ++j)
             {
                 if (row_k[j] != -1 && matrix[i * size + k] != -1)
                 {
