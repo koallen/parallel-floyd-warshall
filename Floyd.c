@@ -3,7 +3,8 @@
 #include <stdlib.h>
 
 #include "Floyd.h"
-#include "Variables.h"
+
+extern int process_count, process_rank;
 
 void Floyd_Warshall(int *mat, int N, int *matrix, int *result)
 {
