@@ -2,9 +2,9 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "Floyd_openMP.c"
+#include "Floyd_openMP.h"
 
-void Floyd_Warshall(int[][] matrix, int size){
+void Floyd_Warshall(int* matrix, int size){
 
 
 	int i, j, k;
@@ -14,10 +14,10 @@ void Floyd_Warshall(int[][] matrix, int size){
 		#pragma omp parallel for private(j) schedule(static)
 		for (i = 0; i < size; i++){
 			for (j = 0; j < size; j++){
-				if (matrix[i][k] != -1 && matrix[k][j] != -1){
-					int new_path = matrix[i][k] + matrix[k][j];
-					if (new_path < matrix[i][j] || matrix[i][j] == -1)
-						matrix[i][j] = new_path;
+				if (matrix[i * size + k] != -1 && matrix[k * size + j] != -1){
+					int new_path = matrix[i * size + k] + matrix[k * size + j];
+					if (new_path < matrix[i * size + j] || matrix[i * size + j] == -1)
+						matrix[i*size+j] = new_path;
 				}
 			}
 		}

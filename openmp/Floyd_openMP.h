@@ -1,1 +1,1 @@
-void Floyd_Warshall(int[][] matrix, int size);
+void Floyd_Warshall(int* matrix, int size);
