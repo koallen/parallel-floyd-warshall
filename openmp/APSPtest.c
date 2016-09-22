@@ -26,7 +26,8 @@ int main(int argc, char **argv)
 	gettimeofday(&tv1, NULL);
 	ST_APSP(ref, N);
 	gettimeofday(&tv2, NULL);
-	printf("Elapsed time (sequential) = %ld usecs\n", (tv2.tv_sec - tv1.tv_sec)*1000000 + tv2.tv_usec - tv1.tv_usec);
+	long sequentialtime = (tv2.tv_sec - tv1.tv_sec)*1000000 + tv2.tv_usec - tv1.tv_usec;
+	printf("Elapsed time (sequential) = %ld usecs\n", sequentialtime);
 
 
 	//compute your results
@@ -36,8 +37,10 @@ int main(int argc, char **argv)
 	gettimeofday(&tv1, NULL);
 	Floyd_Warshall(result, N);
 	gettimeofday(&tv2, NULL);
-	printf("Elapsed time (parallel) = %ld usecs\n", (tv2.tv_sec - tv1.tv_sec)*1000000 + tv2.tv_usec - tv1.tv_usec);
+	long paralleltime = (tv2.tv_sec - tv1.tv_sec)*1000000 + tv2.tv_usec - tv1.tv_usec;
+	printf("Elapsed time (parallel) = %ld usecs\n", paralleltime);
 	
+	printf("Speed up = %.3lf\n", (double)sequentialtime/paralleltime);
 	//compare your result with reference result
 	if(CmpArray(result, ref, N*N))
 		printf("Your result is correct.\n");
