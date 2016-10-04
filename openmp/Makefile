@@ -1,10 +1,12 @@
+CC = gcc
+
 all: test
 
 test: APSPtest.o MatUtil.o Floyd_openMP.o
-	gcc -fopenmp -o $@ $?
+	$(CC) -fopenmp -o $@ $?
 
 %.o: %.c
-	gcc -fopenmp -std=c99 -c $<
+	$(CC) -fopenmp -std=c99 -c $<
 
 clean:
 	rm *.o test
