@@ -216,7 +216,7 @@ endif
 # Target rules
 all: build
 
-build: template
+build: test
 
 check.deps:
 ifeq ($(SAMPLE_ENABLED),0)
@@ -225,19 +225,22 @@ else
 	@echo "Sample is ready - all dependencies have been met"
 endif
 
-template.o:template.cu
+APSPtest.o: APSPtest.cu
 	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
 
-template_cpu.o:template_cpu.cpp
+Floyd.o: Floyd.cu
 	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
 
-template: template.o template_cpu.o
+MatUtil.o: MatUtil.cpp
+	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
+
+test: APSPtest.o MatUtil.o Floyd.o
 	$(EXEC) $(NVCC) $(ALL_LDFLAGS) $(GENCODE_FLAGS) -o $@ $+ $(LIBRARIES)
 
 run: build
-	$(EXEC) ./template
+	$(EXEC) ./test
 
 clean:
-	rm -f template template.o template_cpu.o
+	rm -f test *.o
 
 clobber: clean
