@@ -13,7 +13,7 @@ int main(int argc, char **argv)
 {
     struct timeval tv1, tv2;
 
-    if(argc != 2)
+    if (argc != 2)
     {
         cout << "Usage: test {N}" << endl;
         exit(-1);
@@ -38,8 +38,7 @@ int main(int argc, char **argv)
     memcpy(result, mat, sizeof(int)*N*N);
     //replace by parallel algorithm
     gettimeofday(&tv1, NULL);
-    //Floyd_Warshall(result, N);
-    hello<<<1, 32>>>();
+    Floyd_Warshall(result, N);
     gettimeofday(&tv2, NULL);
     long paralleltime = (tv2.tv_sec - tv1.tv_sec)*1000000 + tv2.tv_usec - tv1.tv_usec;
     cout << "Elapsed time (parallel) = " << paralleltime << " usecs" << endl;
