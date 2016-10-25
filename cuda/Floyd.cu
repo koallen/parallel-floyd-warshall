@@ -28,17 +28,27 @@ __global__ void run(int *matrix, int size, int k)
     int i = blockDim.y * blockIdx.y + threadIdx.y;
     int j = blockDim.x * blockIdx.x + threadIdx.x;
 
+    int i0 = i * size + j;
+    int i1 = i * size + k;
+    int i2 = k * size + j;
+
+    // shared memory
+    __shared__ int i_k[TILE_WIDTH];
+    __shared__ int k_j[TILE_WIDTH];
+
     if (i < size && j < size)
     {
-        int i0 = i * size + j;
-        int i1 = i * size + k;
-        int i2 = k * size + j;
+        i_k[threadIdx.y] = matrix[i1];
+        k_j[threadIdx.x] = matrix[i2];
         int i0_value = matrix[i0];
-        int i1_value = matrix[i1];
-        int i2_value = matrix[i2];
-        if(i1_value != -1 && i2_value != -1)
+
+        __syncthreads(); // sync before compute
+
+        int i_k_value = i_k[threadIdx.y];
+        int k_j_value = k_j[threadIdx.x];
+        if(i_k_value != -1 && k_j_value != -1)
         {
-            int sum = i1_value + i2_value;
+            int sum = i_k_value + k_j_value;
             if (i0_value == -1 || sum < i0_value)
                 matrix[i0] = sum;
         }
