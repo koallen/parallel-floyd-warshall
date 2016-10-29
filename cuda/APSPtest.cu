@@ -5,7 +5,13 @@
 #include <cuda_runtime.h>
 
 #include "MatUtil.h"
-#include "Floyd.h"
+#include "debug.h"
+
+#if (APSP_VER == 1)
+    #include "Floyd.h"
+#else
+    #include "Floyd_row.h"
+#endif
 
 using namespace std;
 
@@ -21,6 +27,20 @@ int main(int argc, char **argv)
 
     //generate a random matrix.
     size_t N = atoi(argv[1]);
+#if (APSP_VER == 1)
+    if (N % (TILE_WIDTH * TILE_WIDTH) != 0)
+    {
+        cout << "The problem size must be divisible by 1024"<< endl;
+        exit(-1);
+    }
+#else
+    if (N % TILE_WIDTH != 0)
+    {
+        cout << "The problem size must be divisible by " << TILE_WIDTH << endl;
+        exit(-1);
+    }
+#endif
+
     int *mat = (int*)malloc(sizeof(int)*N*N);
     GenMatrix(mat, N);
 
