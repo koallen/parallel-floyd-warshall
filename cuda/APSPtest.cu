@@ -29,19 +29,11 @@ int main(int argc, char **argv)
 
     //generate a random matrix.
     size_t N = atoi(argv[1]);
-#if (APSP_VER == 2)
     if (N % TILE_WIDTH != 0)
     {
         cout << "The problem size must be divisible by " << TILE_WIDTH << endl;
         exit(-1);
     }
-#else
-    if (N % (TILE_WIDTH * TILE_WIDTH) != 0)
-    {
-        cout << "The problem size must be divisible by "<< TILE_WIDTH * TILE_WIDTH << endl;
-        exit(-1);
-    }
-#endif
 
     int *mat = (int*)malloc(sizeof(int)*N*N);
     GenMatrix(mat, N);
