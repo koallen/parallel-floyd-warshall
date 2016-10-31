@@ -10,7 +10,7 @@
 #if (APSP_VER == 1)
     #include "Floyd.h"
 #elif (APSP_VER == 2)
-    #include "Floyd_row.h"
+    #include "Floyd_coa.h"
 #else
     #include "Floyd_blk.h"
 #endif
