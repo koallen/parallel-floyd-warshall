@@ -240,7 +240,7 @@ Floyd.o: Floyd.cu
 MatUtil.o: MatUtil.cpp
 	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
 
-test: APSPtest.o MatUtil.o Floyd.o
+test: APSPtest.o MatUtil.o Floyd_blk.o
 	$(EXEC) $(NVCC) $(ALL_LDFLAGS) $(GENCODE_FLAGS) -o $@ $+ $(LIBRARIES)
 
 run: build
