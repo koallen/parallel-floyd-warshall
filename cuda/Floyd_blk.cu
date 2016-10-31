@@ -1,7 +1,6 @@
-#include <iostream>
-#include "Floyd_blk.h"
+#include <cuda_runtime.h>
 
-using namespace std;
+#include "Floyd_blk.h"
 
 void Floyd_Warshall(int *matrix, int size)
 {

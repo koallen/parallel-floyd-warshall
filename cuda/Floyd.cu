@@ -1,3 +1,5 @@
+#include <cuda_runtime.h>
+
 #include "Floyd.h"
 
 void Floyd_Warshall(int *matrix, int size)

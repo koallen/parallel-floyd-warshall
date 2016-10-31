@@ -1,3 +1,5 @@
+#include <cuda_runtime.h>
+
 #include "Floyd_row.h"
 
 void Floyd_Warshall(int *matrix, int size)
@@ -8,8 +10,8 @@ void Floyd_Warshall(int *matrix, int size)
     cudaMemcpy(matrixOnGPU, matrix, sizeof(int)*size*size, cudaMemcpyHostToDevice);
 
     // dimension
-    dim3 dimGrid(size, size / TILE_WIDTH, 1);
-    dim3 dimBlock(1, TILE_WIDTH, 1);
+    dim3 dimGrid(size / TILE_WIDTH, size, 1);
+    dim3 dimBlock(TILE_WIDTH, 1, 1);
 
     // run kernel
     for(int k = 0; k < size; ++k)
@@ -24,7 +26,7 @@ __global__ void run(int *matrix, int size, int k)
 {
     // get thread index
     int i = blockIdx.y;
-    int j = blockDim.x * blockIdx.x + threadIdx.x;
+    int j = blockIdx.x * TILE_WIDTH + threadIdx.x;
 
     int i0 = i * size + j;
     int i1 = i * size + k;
@@ -42,7 +44,7 @@ __global__ void run(int *matrix, int size, int k)
     __syncthreads(); // sync before compute
 
     int k_j_value = k_j[threadIdx.x];
-    if(i_k = -1 && k_j_value != -1)
+    if(i_k != -1 && k_j_value != -1)
     {
         int sum = i_k + k_j_value;
         if (i0_value == -1 || sum < i0_value)
