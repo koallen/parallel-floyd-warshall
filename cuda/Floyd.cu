@@ -1,3 +1,6 @@
+/*
+ * Basic version of Floyd-Warshall
+ */
 #include <cuda_runtime.h>
 
 #include "Floyd.h"
@@ -10,12 +13,11 @@ void Floyd_Warshall(int *matrix, int size)
     cudaMemcpy(matrixOnGPU, matrix, sizeof(int)*size*size, cudaMemcpyHostToDevice);
 
     // dimension
-    dim3 dimGrid(size / TILE_WIDTH, size / TILE_WIDTH, 1);
-    dim3 dimBlock(TILE_WIDTH, TILE_WIDTH, 1);
+    dim3 dimGrid(size, size, 1);
 
     // run kernel
     for(int k = 0; k < size; ++k)
-        run<<<dimGrid, dimBlock>>>(matrixOnGPU, size, k);
+        run<<<dimGrid, 1>>>(matrixOnGPU, size, k);
 
     // get result back
     cudaMemcpy(matrix, matrixOnGPU, sizeof(int)*size*size, cudaMemcpyDeviceToHost);
@@ -24,30 +26,24 @@ void Floyd_Warshall(int *matrix, int size)
 
 __global__ void run(int *matrix, int size, int k)
 {
-    // get thread index
-    int i = blockDim.y * blockIdx.y + threadIdx.y;
-    int j = blockDim.x * blockIdx.x + threadIdx.x;
+    // compute indexes
+    int i = blockIdx.y;
+    int j = blockIdx.x;
 
     int i0 = i * size + j;
     int i1 = i * size + k;
     int i2 = k * size + j;
 
-    // shared memory
-    __shared__ int i_k[TILE_WIDTH];
-    __shared__ int k_j[TILE_WIDTH];
+    // read in dependent values
+    int i_j_value = matrix[i0];
+    int i_k_value = matrix[i1];
+    int k_j_value = matrix[i2];
 
-    i_k[threadIdx.y] = matrix[i1];
-    k_j[threadIdx.x] = matrix[i2];
-    int i0_value = matrix[i0];
-
-    __syncthreads(); // sync before compute
-
-    int i_k_value = i_k[threadIdx.y];
-    int k_j_value = k_j[threadIdx.x];
+    // calculate shortest path
     if(i_k_value != -1 && k_j_value != -1)
     {
         int sum = i_k_value + k_j_value;
-        if (i0_value == -1 || sum < i0_value)
+        if (i_j_value == -1 || sum < i_j_value)
             matrix[i0] = sum;
     }
 }
