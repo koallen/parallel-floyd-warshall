@@ -13,3 +13,5 @@ Also remember to modify `Makefile` to change the dependency of target `test`
 - If you want to run coalesced access optimized version, set `Floyd_coa.o` as dependency
 - If you want to run shared memory optimized version, set `Floyd_sm.o` as dependency
 - If you want to run fully optimized version, set `Floyd_blk.o` as dependency
+
+**Please run `make clean && make` after you change the above settings each time**
