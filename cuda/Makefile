@@ -234,7 +234,7 @@ Floyd_blk.o: Floyd_blk.cu
 Floyd_coa.o: Floyd_coa.cu
 	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
 
-Floyd_row.o: Floyd_row.cu
+Floyd_sm.o: Floyd_sm.cu
 	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
 
 Floyd.o: Floyd.cu
@@ -243,7 +243,7 @@ Floyd.o: Floyd.cu
 MatUtil.o: MatUtil.cpp
 	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
 
-test: APSPtest.o MatUtil.o Floyd_coa.o
+test: APSPtest.o MatUtil.o Floyd_blk.o
 	$(EXEC) $(NVCC) $(ALL_LDFLAGS) $(GENCODE_FLAGS) -o $@ $+ $(LIBRARIES)
 
 run: build

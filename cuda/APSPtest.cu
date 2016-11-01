@@ -12,7 +12,7 @@
 #elif (APSP_VER == 2)
     #include "Floyd_coa.h"
 #elif (APSP_VER == 3)
-    #include "Floyd_row.h"
+    #include "Floyd_sm.h"
 #else
     #include "Floyd_blk.h"
 #endif
