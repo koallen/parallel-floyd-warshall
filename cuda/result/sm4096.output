@@ -1,4 +1,4 @@
-Elapsed time (sequential) = 475880504 usecs
-Elapsed time (parallel) = 5685172 usecs
-Speed up = 83.7056
+Elapsed time (sequential) = 473136668 usecs
+Elapsed time (parallel) = 33590684 usecs
+Speed up = 14.0854
 Your result is correct.

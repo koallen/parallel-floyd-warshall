@@ -1,5 +1,4 @@
-Elapsed time (sequential) = 474708321 usecs
-Elapsed time (parallel) = 446041946 usecs
-Speed up = 1.06427
-ERROR: l[1] = 5, r[1] = 0
-Your result is wrong.
+Elapsed time (sequential) = 473012249 usecs
+Elapsed time (parallel) = 400902677 usecs
+Speed up = 1.17987
+Your result is correct.
