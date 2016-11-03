@@ -15,3 +15,5 @@ Also remember to modify `Makefile` to change the dependency of target `test`
 - If you want to run fully optimized version, set `Floyd_blk.o` as dependency
 
 **Please run `make clean && make` after you change the above settings each time**
+
+**If you want to profile CUDA kernel, set `PROFILING` in `debug.h`**

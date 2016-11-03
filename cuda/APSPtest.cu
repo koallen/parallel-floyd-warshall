@@ -41,6 +41,7 @@ int main(int argc, char **argv)
     GenMatrix(mat, N);
 
     //compute the reference result.
+#ifndef PROFILING
     int *ref = (int*)malloc(sizeof(int)*N*N);
     memcpy(ref, mat, sizeof(int)*N*N);
     gettimeofday(&tv1, NULL);
@@ -48,6 +49,7 @@ int main(int argc, char **argv)
     gettimeofday(&tv2, NULL);
     long sequentialtime = (tv2.tv_sec - tv1.tv_sec)*1000000 + tv2.tv_usec - tv1.tv_usec;
     cout << "Elapsed time (sequential) = " << sequentialtime << " usecs" << endl;
+#endif
 
     //compute your results
     int *result = (int*)malloc(sizeof(int)*N*N);
@@ -59,10 +61,12 @@ int main(int argc, char **argv)
     long paralleltime = (tv2.tv_sec - tv1.tv_sec)*1000000 + tv2.tv_usec - tv1.tv_usec;
     cout << "Elapsed time (parallel) = " << paralleltime << " usecs" << endl;
 
+#ifndef PROFILING
     cout << "Speed up = " << (double)sequentialtime/paralleltime << endl;
     //compare your result with reference result
     if(CmpArray(result, ref, N*N))
         cout << "Your result is correct." << endl;
     else
         cout << "Your result is wrong." << endl;
+#endif
 }
