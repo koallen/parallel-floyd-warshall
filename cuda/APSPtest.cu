@@ -2,8 +2,6 @@
 #include <cstdlib>
 #include <sys/time.h>
 
-#include <cuda_runtime.h>
-
 #include "MatUtil.h"
 #include "debug.h"
 
@@ -14,7 +12,7 @@
 #elif (APSP_VER == 3)
     #include "Floyd_sm.h"
 #else
-    #include "Floyd_blk.h"
+    #include "Floyd_blk.cuh"
 #endif
 
 #define duration(tv1, tv2) (tv2.tv_sec - tv1.tv_sec) * 1000000 + tv2.tv_usec - tv1.tv_usec
