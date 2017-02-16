@@ -1,5 +1,11 @@
 # CUDA implementation
 
+This implementation follows the idea presented in
+
+> Katz, Gary J., and Joseph T. Kider Jr. "All-pairs shortest-paths for large graphs on the GPU." In Proceedings of the 23rd ACM SIGGRAPH/EUROGRAPHICS symposium on Graphics hardware, pp. 47-55. Eurographics Association, 2008.
+
+## Running the code
+
 Please change the value in `debug.h`
 
 - If you want to run basic version, set `APSP_VER` to 1

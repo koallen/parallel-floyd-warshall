@@ -1,10 +1,10 @@
 # Parallel Floyd-Warshall
 
-Parallelized implementation of the Floyd-Warshall algorithm.
+Parallel implementation of the Floyd-Warshall algorithm.
 
 ## Implementations
 
-The Floyd-Warshall algorithm has been implemented with MPI, OpenMP, and CUDA.
+The Floyd-Warshall algorithm has been implemented with MPI, OpenMP, and CUDA. Please check the corresponding directories for source code.
 
 ## Speed up
 
