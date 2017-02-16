@@ -17,6 +17,8 @@
     #include "Floyd_blk.h"
 #endif
 
+#define duration(tv1, tv2) (tv2.tv_sec - tv1.tv_sec) * 1000000 + tv2.tv_usec - tv1.tv_usec
+
 using namespace std;
 
 int main(int argc, char **argv)
@@ -29,38 +31,52 @@ int main(int argc, char **argv)
         exit(-1);
     }
 
-    //generate a random matrix.
+	/*
+	 * Input matrix generation
+	 */
     size_t N = atoi(argv[1]);
-    /*if (N % TILE_WIDTH != 0)*/
-    /*{*/
-        /*cout << "The problem size must be divisible by " << TILE_WIDTH << endl;*/
-        /*exit(-1);*/
-    /*}*/
-
-    int *mat = (int*)malloc(sizeof(int)*N*N);
+	int matrixElementCount = N * N;
+    int *mat = (int*)malloc(sizeof(int) * matrixElementCount);
     GenMatrix(mat, N);
 
-    //compute the reference result.
+	/*
+	 * Sequential Floyd Warshall
+	 */
 #ifndef PROFILING
-    int *ref = (int*)malloc(sizeof(int)*N*N);
-    memcpy(ref, mat, sizeof(int)*N*N);
+    int *ref = (int*)malloc(sizeof(int) * matrixElementCount);
+    memcpy(ref, mat, sizeof(int) * matrixElementCount);
     gettimeofday(&tv1, NULL);
     ST_APSP(ref, N);
     gettimeofday(&tv2, NULL);
-    long sequentialtime = (tv2.tv_sec - tv1.tv_sec)*1000000 + tv2.tv_usec - tv1.tv_usec;
+    long sequentialtime = duration(tv1, tv2);
     cout << "Elapsed time (sequential) = " << sequentialtime << " usecs" << endl;
 #endif
 
-    //compute your results
-    int *result = (int*)malloc(sizeof(int)*N*N);
-    memcpy(result, mat, sizeof(int)*N*N);
-    //replace by parallel algorithm
+    /*
+	 * Parallel Floyd Warshall
+	 */
+    int *result = (int*)malloc(sizeof(int) * matrixElementCount);
+    memcpy(result, mat, sizeof(int) * matrixElementCount);
     gettimeofday(&tv1, NULL);
     Floyd_Warshall(result, N);
     gettimeofday(&tv2, NULL);
-    long paralleltime = (tv2.tv_sec - tv1.tv_sec)*1000000 + tv2.tv_usec - tv1.tv_usec;
+    long paralleltime = duration(tv1, tv2);
     cout << "Elapsed time (parallel) = " << paralleltime << " usecs" << endl;
+#ifdef LOOP
+	for (int i = 0; i < LOOP - 1; ++i)
+	{
+		memcpy(result, mat, sizeof(int) * matrixElementCount);
+		gettimeofday(&tv1, NULL);
+		Floyd_Warshall(result, N);
+		gettimeofday(&tv2, NULL);
+		long paralleltime = duration(tv1, tv2);
+		cout << "Elapsed time (parallel) = " << paralleltime << " usecs" << endl;
+	}
+#endif
 
+	/*
+	 * Speed up calculation
+	 */
 #ifndef PROFILING
     cout << "Speed up = " << (double)sequentialtime/paralleltime << endl;
     //compare your result with reference result
